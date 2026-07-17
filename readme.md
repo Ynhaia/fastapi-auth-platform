@@ -1,0 +1,448 @@
+# FastAPI User Authentication System
+
+基于 **FastAPI + MySQL + SQLAlchemy + JWT** 实现的用户认证系统。
+
+本项目主要实现用户注册、登录认证、密码加密存储以及基于 JWT Token 的接口访问控制。
+
+项目按照实际后端开发模式进行模块化设计，将路由、数据库、认证、安全逻辑进行分层管理。
+
+
+---
+
+## 项目背景
+
+传统 Web 应用中，用户认证通常包含：
+
+- 用户注册
+- 密码安全存储
+- 用户登录验证
+- 身份认证
+- 用户信息获取
+
+本项目模拟企业后端用户系统，实现完整认证流程。
+
+
+---
+
+# 技术栈
+
+## 后端框架
+
+- FastAPI
+
+## 数据库
+
+- MySQL
+
+## ORM
+
+- SQLAlchemy
+
+## 数据校验
+
+- Pydantic
+
+## 身份认证
+
+- JWT(JSON Web Token)
+
+## 密码安全
+
+- bcrypt
+
+
+---
+
+# 已实现功能
+
+
+## 用户注册
+
+- 用户名唯一校验
+- 密码 bcrypt 加密
+- 用户信息保存 MySQL
+
+
+接口：
+
+```
+POST /register
+```
+
+
+请求：
+
+```json
+{
+    "username":"admin",
+    "password":"123456"
+}
+```
+
+
+返回：
+
+```json
+{
+    "msg":"注册成功",
+    "id":1
+}
+```
+
+
+
+---
+
+## 用户登录
+
+功能：
+
+- 用户查询
+- bcrypt密码验证
+- JWT Token生成
+
+
+接口：
+
+```
+POST /login
+```
+
+
+返回：
+
+```json
+{
+    "access_token":"xxxxx",
+    "token_type":"bearer"
+}
+```
+
+
+
+---
+
+## JWT身份认证
+
+
+登录成功后获取 Token。
+
+
+访问受保护接口时：
+
+```
+Authorization: Bearer Token
+```
+
+
+系统流程：
+
+```
+客户端请求
+      |
+      ↓
+携带JWT Token
+      |
+      ↓
+解析Token
+      |
+      ↓
+获取用户ID
+      |
+      ↓
+查询数据库
+      |
+      ↓
+返回用户信息
+```
+
+
+
+---
+
+## 获取用户信息
+
+
+接口：
+
+```
+GET /user/info
+```
+
+
+需要携带JWT Token。
+
+
+返回：
+
+```json
+{
+    "id":1,
+    "username":"admin"
+}
+```
+
+
+
+---
+
+## 用户列表查询
+
+
+接口：
+
+```
+GET /users
+```
+
+
+返回数据库中的用户信息。
+
+
+接口使用 Pydantic Response Model 对返回数据进行过滤，避免密码字段泄露。
+
+
+
+---
+
+# 项目结构
+
+
+```
+fastapi_demo
+
+├── main.py                 # 项目入口
+
+├── database.py             # 数据库连接配置
+
+├── models.py               # SQLAlchemy数据库模型
+
+├── schemas.py              # Pydantic数据模型
+
+├── security.py             # JWT与密码加密逻辑
+
+├── dependencies.py         # Token认证依赖
+
+
+├── routers
+
+│   ├── auth.py             # 注册、登录接口
+
+│   └── user.py             # 用户相关接口
+
+
+├── requirements.txt
+
+└── README.md
+
+```
+
+
+
+---
+
+# 核心设计
+
+
+## 密码安全
+
+用户注册时：
+
+```
+明文密码
+      |
+      ↓
+bcrypt + salt
+      |
+      ↓
+哈希密码
+      |
+      ↓
+保存数据库
+```
+
+
+数据库不会保存用户明文密码。
+
+
+
+---
+
+## JWT认证设计
+
+
+Token中保存：
+
+```json
+{
+    "sub":"用户ID",
+    "exp":"过期时间"
+}
+```
+
+
+请求接口：
+
+```
+JWT
+ |
+ ↓
+解析用户ID
+ |
+ ↓
+查询数据库
+ |
+ ↓
+验证用户状态
+ |
+ ↓
+执行接口逻辑
+```
+
+
+
+---
+
+# 环境要求
+
+
+Python:
+
+```
+Python 3.10+
+```
+
+
+MySQL:
+
+```
+MySQL 8.0+
+```
+
+
+
+---
+
+# 安装运行
+
+
+## 1. 克隆项目
+
+
+```bash
+git clone 项目地址
+```
+
+
+
+## 2. 创建虚拟环境
+
+
+```bash
+python -m venv venv
+```
+
+
+激活：
+
+Windows:
+
+```bash
+venv\Scripts\activate
+```
+
+
+
+---
+
+## 3. 安装依赖
+
+
+```bash
+pip install -r requirements.txt
+```
+
+
+
+---
+
+## 4. 配置数据库
+
+
+修改：
+
+```
+database.py
+```
+
+
+配置 MySQL：
+
+```python
+DATABASE_URL = "mysql+pymysql://用户名:密码@localhost/数据库名"
+```
+
+
+
+---
+
+## 5. 启动项目
+
+
+```bash
+uvicorn main:app --reload
+```
+
+
+访问：
+
+```
+http://127.0.0.1:8000/docs
+```
+
+
+使用 Swagger UI 测试接口。
+
+
+
+---
+
+# 后续规划
+
+
+## v1.1
+
+- 增加用户角色(role)
+- 管理员权限控制
+- RBAC权限系统
+
+
+## v1.2
+
+- 用户状态管理
+- 用户冻结/解冻
+- 管理后台接口
+
+
+## v1.3
+
+- Docker部署
+- Redis缓存
+- 接口自动化测试
+- CI/CD
+
+
+---
+
+# 项目收获
+
+通过本项目学习并实践：
+
+- FastAPI项目结构设计
+- RESTful API开发
+- MySQL数据库操作
+- SQLAlchemy ORM使用
+- JWT认证流程
+- bcrypt密码安全
+- 后端模块化开发
+
