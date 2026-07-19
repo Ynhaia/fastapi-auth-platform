@@ -42,7 +42,9 @@ def register(user: UserCreate):
 
         db_user = User(
             username=user.username,
-            password=hashed_password
+            password=hashed_password,
+            role="user",
+            status="active"
         )
 
 
@@ -83,7 +85,12 @@ def login(user: UserLogin):
                 "msg":"用户名或密码错误"
             }
 
+        if db_user.status == "disabled":
 
+            return {
+                "msg":"账号已被冻结"
+            }
+ 
         if not verify_password(
             user.password,
             db_user.password
@@ -96,7 +103,8 @@ def login(user: UserLogin):
 
         token = create_access_token(
     {
-        "sub":str(db_user.id)
+        "sub":str(db_user.id),
+        "role":db_user.role
     }
 )
 

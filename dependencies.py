@@ -65,3 +65,15 @@ def get_current_user(
             status_code=401,
             detail="Token无效"
         )
+def require_admin(
+    user: User = Depends(get_current_user)
+):
+
+    if user.role != "admin":
+
+        raise HTTPException(
+            status_code=403,
+            detail="没有管理员权限"
+        )
+
+    return user
