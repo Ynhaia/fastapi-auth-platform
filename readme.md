@@ -1,6 +1,10 @@
 # FastAPI User Authentication System
 
-基于 **FastAPI + MySQL + SQLAlchemy + JWT** 实现的用户认证系统。
+基于 FastAPI + MySQL + SQLAlchemy + JWT + RBAC 实现的用户认证与权限管理系统。
+
+本项目模拟企业后台用户管理系统，实现用户注册、登录认证、JWT身份校验、角色权限控制以及管理员账号管理功能。
+
+同时使用 pytest + requests 构建接口自动化测试体系，并通过 Allure生成测试报告。
 
 本项目主要实现用户注册、登录认证、密码加密存储以及基于 JWT Token 的接口访问控制。
 
@@ -46,9 +50,23 @@
 
 - JWT(JSON Web Token)
 
+
+## 权限控制
+
+- RBAC(Role-Based Access Control)
+- 用户角色管理
+- 管理员权限控制
+
+
 ## 密码安全
 
 - bcrypt
+
+## 测试
+
+- pytest
+- requests
+- Allure
 
 
 ---
@@ -202,6 +220,93 @@ GET /users
 接口使用 Pydantic Response Model 对返回数据进行过滤，避免密码字段泄露。
 
 
+---
+
+---
+
+# 接口自动化测试
+
+
+本项目使用 pytest + requests 对核心接口进行自动化测试。
+
+
+测试覆盖：
+
+
+## 用户认证
+
+- 用户注册成功
+- 用户登录成功
+
+
+## 用户接口
+
+- 携带JWT Token获取用户信息
+- Token权限校验
+
+
+## 管理员权限
+
+- 管理员查询用户列表
+- 管理员冻结普通用户
+- 管理员恢复普通用户
+
+
+运行测试：
+
+```bash
+pytest
+生成Allure报告：
+
+pytest --alluredir=allure-results
+
+查看报告：
+
+allure serve allure-results
+
+
+## 角色权限管理
+
+
+系统采用 RBAC 权限模型，根据用户角色控制接口访问权限。
+
+
+目前支持角色：
+
+- admin 管理员
+- user 普通用户
+
+
+权限流程：
+
+---
+
+## 用户状态管理
+
+
+系统支持用户状态控制。
+
+
+用户状态：
+
+- active 正常用户
+- frozen 冻结用户
+
+
+冻结后：
+
+- 用户无法登录系统
+- 已有权限接口无法继续访问
+
+
+管理员可以执行：
+
+- 冻结普通用户
+- 恢复用户状态
+
+
+接口：
+
 
 ---
 
@@ -228,7 +333,18 @@ fastapi_demo
 
 │   ├── auth.py             # 注册、登录接口
 
-│   └── user.py             # 用户相关接口
+│   ├── user.py             # 用户信息接口
+
+│   └── admin.py            # 管理员权限接口
+
+
+├──tests
+
+│   ├── test_auth.py        # 认证测试
+
+│   ├── test_user.py        # 用户接口测试
+
+│   └── test_admin.py       # 管理员权限测试
 
 
 ├── requirements.txt
@@ -276,6 +392,7 @@ Token中保存：
 ```json
 {
     "sub":"用户ID",
+    "role":"admin",
     "exp":"过期时间"
 }
 ```
@@ -287,13 +404,16 @@ Token中保存：
 JWT
  |
  ↓
-解析用户ID
+解析用户ID和角色
  |
  ↓
-查询数据库
+查询用户信息
  |
  ↓
 验证用户状态
+ |
+ ↓
+判断接口权限
  |
  ↓
 执行接口逻辑
@@ -410,27 +530,21 @@ http://127.0.0.1:8000/docs
 # 后续规划
 
 
-## v1.1
-
-- 增加用户角色(role)
-- 管理员权限控制
-- RBAC权限系统
+# 后续规划
 
 
-## v1.2
+## v2.1
 
-- 用户状态管理
-- 用户冻结/解冻
-- 管理后台接口
+- 优化测试数据管理
+- 增加pytest fixture
+- 增加异常场景测试
 
 
-## v1.3
+## v2.2
 
 - Docker部署
 - Redis缓存
-- 接口自动化测试
-- CI/CD
-
+- CI/CD自动化测试流程
 
 ---
 
@@ -445,4 +559,7 @@ http://127.0.0.1:8000/docs
 - JWT认证流程
 - bcrypt密码安全
 - 后端模块化开发
+- RBAC权限模型设计
+- 用户状态管理
+- 管理员接口开发
 
