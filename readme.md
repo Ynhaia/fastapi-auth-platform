@@ -1,6 +1,10 @@
 # FastAPI User Authentication System
 
-基于 **FastAPI + MySQL + SQLAlchemy + JWT** 实现的用户认证系统。
+基于 FastAPI + MySQL + SQLAlchemy + JWT + RBAC 实现的用户认证与权限管理系统。
+
+本项目模拟企业后台用户管理系统，实现用户注册、登录认证、JWT身份校验、角色权限控制以及管理员账号管理功能。
+
+同时使用 pytest + requests 构建接口自动化测试体系，并通过 Allure生成测试报告。
 
 本项目主要实现用户注册、登录认证、密码加密存储以及基于 JWT Token 的接口访问控制。
 
@@ -58,7 +62,11 @@
 
 - bcrypt
 
+## 测试
 
+- pytest
+- requests
+- Allure
 
 
 ---
@@ -214,6 +222,49 @@ GET /users
 
 ---
 
+---
+
+# 接口自动化测试
+
+
+本项目使用 pytest + requests 对核心接口进行自动化测试。
+
+
+测试覆盖：
+
+
+## 用户认证
+
+- 用户注册成功
+- 用户登录成功
+
+
+## 用户接口
+
+- 携带JWT Token获取用户信息
+- Token权限校验
+
+
+## 管理员权限
+
+- 管理员查询用户列表
+- 管理员冻结普通用户
+- 管理员恢复普通用户
+
+
+运行测试：
+
+```bash
+pytest
+生成Allure报告：
+
+pytest --alluredir=allure-results
+
+查看报告：
+
+allure serve allure-results
+
+
 ## 角色权限管理
 
 
@@ -285,6 +336,15 @@ fastapi_demo
 │   ├── user.py             # 用户信息接口
 
 │   └── admin.py            # 管理员权限接口
+
+
+├──tests
+
+│   ├── test_auth.py        # 认证测试
+
+│   ├── test_user.py        # 用户接口测试
+
+│   └── test_admin.py       # 管理员权限测试
 
 
 ├── requirements.txt
@@ -473,21 +533,18 @@ http://127.0.0.1:8000/docs
 # 后续规划
 
 
-## v2.0
+## v2.1
+
+- 优化测试数据管理
+- 增加pytest fixture
+- 增加异常场景测试
+
+
+## v2.2
 
 - Docker部署
 - Redis缓存
-- 接口自动化测试
-- CI/CD
-
-
-## v2.1
-
-- 完善管理员后台
-- 操作日志记录
-- 登录日志记录
-- JWT刷新机制
-
+- CI/CD自动化测试流程
 
 ---
 
